@@ -1,13 +1,11 @@
 package domain.entities;
 
-import java.io.FileInputStream;
-
 public class CustomFile {
-    public final String fileName;
-    public final FileInputStream file;
+    public final String name;
+    public final byte[] fileContent;
 
-    public CustomFile(String fileName, FileInputStream file) {
-        this.fileName = fileName;
-        this.file = file;
+    public CustomFile(String name, byte[] fileContent) {
+        this.name = name;
+        this.fileContent = fileContent;
     }
 }
