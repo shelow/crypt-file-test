@@ -1,6 +1,7 @@
 package unit.domain.usecases;
 
 import domain.entities.CustomFile;
+import domain.entities.UploadParams;
 import domain.exceptions.MissingFileExsception;
 import domain.usecases.EncryptContentFile;
 import domain.usecases.UploadFile;
@@ -41,7 +42,7 @@ public class uploadFileTest {
     @Test(expected = MissingFileExsception.class)
     public void upload_null_file_should_throw_missing_file_exception(){
         //WHEN
-        uploadFile.handle(null, false);
+        uploadFile.handle(null, UploadParams.of(false));
     }
 
     @Test
@@ -50,10 +51,10 @@ public class uploadFileTest {
         CustomFile custumeFileWithMonFichier = createCustumeFileWithMonFichier();
 
         //WHEN
-        uploadFile.handle(custumeFileWithMonFichier, false);
+        uploadFile.handle(custumeFileWithMonFichier, UploadParams.of(false));
 
         //THEN
-        Optional<CustomFile> found = memoryFileSystemGateway.read("mon_fichier.txt");
+        CustomFile found = memoryFileSystemGateway.read("mon_fichier.txt").orElseThrow();
         assertThat(getContentFileAsString(found), is(equalTo("Bonjour, tout le monde !!!")));
     }
 
@@ -63,10 +64,10 @@ public class uploadFileTest {
         CustomFile custumeFileWithMonFichier = createCustumeFileWithMonFichier();
 
         //WHEN
-        uploadFile.handle(custumeFileWithMonFichier, true);
+        uploadFile.handle(custumeFileWithMonFichier, UploadParams.of(true));
 
         //THEN
-        Optional<CustomFile> found = memoryFileSystemGateway.read("mon_fichier.txt");
+        CustomFile found = memoryFileSystemGateway.read("mon_fichier.txt").orElseThrow();
         assertThat(getContentFileAsString(found), is(not(equalTo("Bonjour, tout le monde !!!"))));
     }
 
@@ -76,15 +77,16 @@ public class uploadFileTest {
         CustomFile custumeFileWithMonFichier = createCustumeFileWithMonFichier();
 
         //WHEN
-        uploadFile.handle(custumeFileWithMonFichier, true);
+        UploadParams uploadParams = UploadParams.of(true, "password");
+        uploadFile.handle(custumeFileWithMonFichier, uploadParams);
 
         //THEN
-        Optional<CustomFile> found = memoryFileSystemGateway.read("mon_fichier.txt");
+        CustomFile found = memoryFileSystemGateway.read("mon_fichier.txt").orElseThrow();
         assertThat(getContentFileAsString(found), is(not(equalTo("Bonjour, tout le monde !!!"))));
     }
 
-    private String getContentFileAsString(Optional<CustomFile> found) {
-        return new String(found.orElseThrow().fileContent, StandardCharsets.UTF_8);
+    private String getContentFileAsString(CustomFile found) {
+        return new String(found.content, StandardCharsets.UTF_8);
     }
 
     private CustomFile createCustumeFileWithMonFichier() {

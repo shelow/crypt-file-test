@@ -1,12 +1,11 @@
 package domain.usecases;
 
 import domain.entities.CustomFile;
+import domain.entities.UploadParams;
 import domain.ports.gateway.SecurityGateway;
 
-import javax.crypto.*;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
 
 public class EncryptContentFile {
 
@@ -18,19 +17,21 @@ public class EncryptContentFile {
         this.securityGateway = securityGateway;
     }
 
-    public CustomFile createNewEncryptContentFile(CustomFile file) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
-        Cipher cipher = createCipher();
-        byte[] encryptedText = cipher.doFinal(file.fileContent);
+    public CustomFile createNewEncryptContentFile(CustomFile file, UploadParams params) throws Exception {
+        Cipher cipher = createCipher(params);
+        byte[] encryptedText = cipher.doFinal(file.content);
         return new CustomFile(file.name, encryptedText);
     }
 
-    private Cipher createCipher() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+    private Cipher createCipher(UploadParams params) throws Exception {
         byte[] iv = GenerateRandomBytes.withSizeOf(IV_SIZE);
-        return CreateAesGcmCipherInstance.getConfigurated(getSecretKey(), iv);
+        return CreateAesGcmCipherInstance.withoutPassword(getSecretKey(params.password), iv);
     }
 
-    private SecretKey getSecretKey() throws NoSuchAlgorithmException {
+    private SecretKey getSecretKey(char[] password) throws Exception {
         byte[] strKey = securityGateway.loadSecretKey();
-        return GenerateAesSecrestKey.fromStrKey(strKey);
+        return password.length == 0
+                ? GenerateAesSecrestKey.fromStrKey(strKey)
+                : GenerateAesSecrestKey.withPassword(password);
     }
 }

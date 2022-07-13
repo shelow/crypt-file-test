@@ -2,10 +2,10 @@ package domain.entities;
 
 public class CustomFile {
     public final String name;
-    public final byte[] fileContent;
+    public final byte[] content;
 
-    public CustomFile(String name, byte[] fileContent) {
+    public CustomFile(String name, byte[] content) {
         this.name = name;
-        this.fileContent = fileContent;
+        this.content = content;
     }
 }
