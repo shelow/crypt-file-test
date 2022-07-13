@@ -3,6 +3,7 @@ package unit.domain.usecases;
 import domain.entities.CustomFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -21,5 +22,11 @@ public class TestFileUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static String getContentFileAsString(CustomFile found) {
+        String res = new String(found.content, StandardCharsets.UTF_8);
+        if(res.isEmpty()) throw new NullPointerException();
+        return res;
     }
 }

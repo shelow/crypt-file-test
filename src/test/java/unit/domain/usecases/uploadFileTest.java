@@ -12,9 +12,6 @@ import org.junit.Test;
 import unit.adapters.InMemoryFileSystemGateway;
 import unit.adapters.InMemorySecurityGateway;
 
-import java.io.FileNotFoundException;
-import java.nio.charset.StandardCharsets;
-
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static unit.domain.usecases.TestFileUtils.*;
@@ -98,12 +95,6 @@ public class uploadFileTest {
     public void upload_file_with_null_password_should_throw_password_missing_exception() {
        //WHEN
         UploadParams.of(true, null);
-    }
-
-    private String getContentFileAsString(CustomFile found) {
-        String res = new String(found.content, StandardCharsets.UTF_8);
-        if(res.isEmpty()) throw new NullPointerException();
-        return res;
     }
 
 }
