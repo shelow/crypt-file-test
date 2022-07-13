@@ -4,18 +4,6 @@ import domain.entities.CustomFile;
 import domain.exceptions.MissingFileExsception;
 import domain.ports.gateway.FileSystemGateway;
 
-import javax.crypto.*;
-import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.AlgorithmParameterSpec;
-
-import static javax.crypto.Cipher.ENCRYPT_MODE;
-
 public class UploadFile {
 
     private final FileSystemGateway fileSystemGateway;

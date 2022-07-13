@@ -70,6 +70,19 @@ public class uploadFileTest {
         assertThat(getContentFileAsString(found), is(not(equalTo("Bonjour, tout le monde !!!"))));
     }
 
+    @Test
+    public void upload_file_and_encrypt_with_password_should_save_encrypt_file_in_directory() throws FileNotFoundException {
+        //GIVEN
+        CustomFile custumeFileWithMonFichier = createCustumeFileWithMonFichier();
+
+        //WHEN
+        uploadFile.handle(custumeFileWithMonFichier, true);
+
+        //THEN
+        Optional<CustomFile> found = memoryFileSystemGateway.read("mon_fichier.txt");
+        assertThat(getContentFileAsString(found), is(not(equalTo("Bonjour, tout le monde !!!"))));
+    }
+
     private String getContentFileAsString(Optional<CustomFile> found) {
         return new String(found.orElseThrow().fileContent, StandardCharsets.UTF_8);
     }
