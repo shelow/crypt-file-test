@@ -25,7 +25,8 @@ public class EncryptContentFile {
 
     private Cipher createCipher(UploadParams params) throws Exception {
         byte[] iv = GenerateRandomBytes.withSizeOf(IV_SIZE);
-        return CreateAesGcmCipherInstance.withoutPassword(getSecretKey(params.password), iv);
+        SecretKey secretKey = getSecretKey(params.password);
+        return CreateAesGcmCipherInstance.getConfigurated(secretKey, iv);
     }
 
     private SecretKey getSecretKey(char[] password) throws Exception {

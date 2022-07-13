@@ -2,6 +2,7 @@ package domain.usecases;
 
 import domain.entities.CustomFile;
 import domain.entities.UploadParams;
+import domain.exceptions.EmptyFileException;
 import domain.exceptions.MissingFileExsception;
 import domain.ports.gateway.FileSystemGateway;
 
@@ -32,9 +33,8 @@ public class UploadFile {
         }
     }
 
-
-
     private void checkFile(CustomFile file) {
         if(file == null) throw new MissingFileExsception();
+        if(file.content.length == 0) throw new EmptyFileException();
     }
 }

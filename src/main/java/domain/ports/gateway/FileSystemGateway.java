@@ -8,7 +8,5 @@ public interface FileSystemGateway {
 
     boolean write(CustomFile file);
 
-    boolean exists(String fileName);
-
     Optional<CustomFile> read(String String);
 }

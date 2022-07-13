@@ -2,7 +2,9 @@ package unit.domain.usecases;
 
 import domain.entities.CustomFile;
 import domain.entities.UploadParams;
+import domain.exceptions.EmptyFileException;
 import domain.exceptions.MissingFileExsception;
+import domain.exceptions.MissingPasswordException;
 import domain.usecases.EncryptContentFile;
 import domain.usecases.UploadFile;
 import org.junit.Before;
@@ -11,22 +13,14 @@ import unit.adapters.InMemoryFileSystemGateway;
 import unit.adapters.InMemorySecurityGateway;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Optional;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
+import static unit.domain.usecases.TestFileUtils.*;
 
 public class uploadFileTest {
 
-    public static final String MON_FICHIER_TXT = "mon_fichier.txt";
-    public static final String POINT = ".";
-    public static final String SRC = "src";
-    public static final String TEST = "test";
-    public static final String RESOURCES = "resources";
     private InMemoryFileSystemGateway memoryFileSystemGateway;
     private InMemorySecurityGateway memorySecurityGateway;
     private UploadFile uploadFile;
@@ -46,54 +40,70 @@ public class uploadFileTest {
     }
 
     @Test
-    public void upload_file_should_save_it_in_directory() throws FileNotFoundException {
+    public void upload_file_should_save_it_in_directory() {
         //GIVEN
-        CustomFile custumeFileWithMonFichier = createCustumeFileWithMonFichier();
+        CustomFile customFileWithMonFichier = createcustomFileWithMonFichier(MON_FICHIER_TXT);
 
         //WHEN
-        uploadFile.handle(custumeFileWithMonFichier, UploadParams.of(false));
+        uploadFile.handle(customFileWithMonFichier, UploadParams.of(false));
 
         //THEN
-        CustomFile found = memoryFileSystemGateway.read("mon_fichier.txt").orElseThrow();
+        CustomFile found = memoryFileSystemGateway.read(MON_FICHIER_TXT).orElseThrow();
         assertThat(getContentFileAsString(found), is(equalTo("Bonjour, tout le monde !!!")));
     }
 
-    @Test
-    public void upload_file_and_encrypt_its_content_should_save_encrypt_file_in_directory() throws FileNotFoundException {
+    @Test(expected = EmptyFileException.class)
+    public void upload_empty_file_should_throw_empty_exception() {
         //GIVEN
-        CustomFile custumeFileWithMonFichier = createCustumeFileWithMonFichier();
+        CustomFile customFileWithMonFichier = createcustomFileWithMonFichier(EMPTY_FILE_TXT);
 
         //WHEN
-        uploadFile.handle(custumeFileWithMonFichier, UploadParams.of(true));
+        uploadFile.handle(customFileWithMonFichier, UploadParams.of(false));
+    }
+
+    @Test
+    public void upload_file_and_encrypt_its_content_should_save_encrypt_file_in_directory() {
+        //GIVEN
+        CustomFile customFileWithMonFichier = createcustomFileWithMonFichier(MON_FICHIER_TXT);
+
+        //WHEN
+        uploadFile.handle(customFileWithMonFichier, UploadParams.of(true));
 
         //THEN
-        CustomFile found = memoryFileSystemGateway.read("mon_fichier.txt").orElseThrow();
+        CustomFile found = memoryFileSystemGateway.read(MON_FICHIER_TXT).orElseThrow();
         assertThat(getContentFileAsString(found), is(not(equalTo("Bonjour, tout le monde !!!"))));
     }
 
     @Test
-    public void upload_file_and_encrypt_with_password_should_save_encrypt_file_in_directory() throws FileNotFoundException {
+    public void upload_file_and_encrypt_with_password_should_save_encrypt_file_in_directory() {
         //GIVEN
-        CustomFile custumeFileWithMonFichier = createCustumeFileWithMonFichier();
+        CustomFile customFileWithMonFichier = createcustomFileWithMonFichier(MON_FICHIER_TXT);
 
         //WHEN
         UploadParams uploadParams = UploadParams.of(true, "password");
-        uploadFile.handle(custumeFileWithMonFichier, uploadParams);
+        uploadFile.handle(customFileWithMonFichier, uploadParams);
 
         //THEN
-        CustomFile found = memoryFileSystemGateway.read("mon_fichier.txt").orElseThrow();
+        CustomFile found = memoryFileSystemGateway.read(MON_FICHIER_TXT).orElseThrow();
         assertThat(getContentFileAsString(found), is(not(equalTo("Bonjour, tout le monde !!!"))));
     }
 
-    private String getContentFileAsString(CustomFile found) {
-        return new String(found.content, StandardCharsets.UTF_8);
+    @Test(expected = MissingPasswordException.class)
+    public void upload_file_with_empty_password_should_throw_password_missing_exception() {
+        //WHEN
+        UploadParams.of(true, "");
     }
 
-    private CustomFile createCustumeFileWithMonFichier() {
-        try {
-            return new CustomFile(MON_FICHIER_TXT, Files.readAllBytes(Paths.get(POINT, SRC, TEST, RESOURCES, MON_FICHIER_TXT)));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    @Test(expected = MissingPasswordException.class)
+    public void upload_file_with_null_password_should_throw_password_missing_exception() {
+       //WHEN
+        UploadParams.of(true, null);
     }
+
+    private String getContentFileAsString(CustomFile found) {
+        String res = new String(found.content, StandardCharsets.UTF_8);
+        if(res.isEmpty()) throw new NullPointerException();
+        return res;
+    }
+
 }

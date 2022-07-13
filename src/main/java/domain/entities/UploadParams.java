@@ -1,5 +1,7 @@
 package domain.entities;
 
+import domain.exceptions.MissingPasswordException;
+
 public class UploadParams {
     public final boolean shouldEncryptFile;
     public final char[] password;
@@ -10,6 +12,7 @@ public class UploadParams {
     }
 
     public static UploadParams of(boolean encryptFile, String password) {
+        if(password == null || password.isEmpty()) throw new MissingPasswordException();
         return new UploadParams(encryptFile, password.toCharArray());
     }
 
