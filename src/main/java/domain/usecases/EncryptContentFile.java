@@ -1,38 +1,37 @@
 package domain.usecases;
 
+import domain.entities.CipherOptions;
+import domain.entities.CryptoParams;
 import domain.entities.CustomFile;
-import domain.entities.UploadParams;
-import domain.ports.gateway.SecurityGateway;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
+import java.nio.ByteBuffer;
+
+import static domain.usecases.GenerateAesSecrestKey.SALT_SIZE;
+import static javax.crypto.Cipher.ENCRYPT_MODE;
 
 public class EncryptContentFile {
 
     public static final int IV_SIZE = 12;
 
-    private SecurityGateway securityGateway;
+    private GenerateNewContent generateNewContent;
 
-    public EncryptContentFile(SecurityGateway securityGateway) {
-        this.securityGateway = securityGateway;
+    public EncryptContentFile(GenerateNewContent generateNewContent) {
+        this.generateNewContent = generateNewContent;
     }
 
-    public CustomFile createNewEncryptContentFile(CustomFile file, UploadParams params) throws Exception {
-        Cipher cipher = createCipher(params);
-        byte[] encryptedText = cipher.doFinal(file.content);
-        return new CustomFile(file.name, encryptedText);
+    CustomFile encrypt(CustomFile file, CryptoParams params) throws Exception {
+            byte[] iv = GenerateRandomBytes.withSizeOf(IV_SIZE);
+            byte[] salt = params.password.length > 0 ? GenerateRandomBytes.withSizeOf(SALT_SIZE) : new byte[0];
+            byte[] content = generateNewContent.handle(file.content, params, CipherOptions.of(ENCRYPT_MODE, iv, salt));
+            return new CustomFile(file.name, addIvAndSaltInResultContent(iv, salt, content));
     }
 
-    private Cipher createCipher(UploadParams params) throws Exception {
-        byte[] iv = GenerateRandomBytes.withSizeOf(IV_SIZE);
-        SecretKey secretKey = getSecretKey(params.password);
-        return CreateAesGcmCipherInstance.getConfigurated(secretKey, iv);
-    }
-
-    private SecretKey getSecretKey(char[] password) throws Exception {
-        byte[] strKey = securityGateway.loadSecretKey();
-        return password.length == 0
-                ? GenerateAesSecrestKey.fromStrKey(strKey)
-                : GenerateAesSecrestKey.withPassword(password);
+    private byte[] addIvAndSaltInResultContent(byte[] iv, byte[] salt, byte[] content) {
+        ByteBuffer allocate = ByteBuffer.allocate(iv.length + salt.length + content.length);
+        return allocate
+                .put(iv)
+                .put(salt)
+                .put(content)
+                .array();
     }
 }

@@ -1,4 +1,4 @@
-package unit.adapters;
+package unit.adapters.gateway;
 
 import domain.entities.CustomFile;
 import domain.ports.gateway.FileSystemGateway;

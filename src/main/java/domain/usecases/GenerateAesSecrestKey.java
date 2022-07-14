@@ -1,5 +1,7 @@
 package domain.usecases;
 
+import domain.entities.CipherOptions;
+
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -21,15 +23,13 @@ public class GenerateAesSecrestKey {
     public static SecretKey fromStrKey(byte[] secretKey) throws NoSuchAlgorithmException {
         KeyGenerator keyGen = KeyGenerator.getInstance(AES);
         keyGen.init(KEYSIZE, SecureRandom.getInstanceStrong());
-        SecretKey key = new SecretKeySpec(secretKey, AES);
-        return key;
+        return new SecretKeySpec(secretKey, AES);
     }
 
 
-    public static SecretKey withPassword(char[] password) throws Exception {
-        byte[] salt = GenerateRandomBytes.withSizeOf(SALT_SIZE);
+    public static SecretKey withPassword(char[] password, CipherOptions options) throws Exception {
         SecretKeyFactory factory = SecretKeyFactory.getInstance(PBKDF_2_WITH_HMAC_SHA_256);
-        KeySpec spec = new PBEKeySpec(password, salt, ITERATION_COUNT, KEYSIZE);
+        KeySpec spec = new PBEKeySpec(password, options.salt, ITERATION_COUNT, KEYSIZE);
         return new SecretKeySpec(factory.generateSecret(spec).getEncoded(), AES);
     }
 }

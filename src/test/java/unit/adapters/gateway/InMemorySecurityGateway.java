@@ -1,4 +1,4 @@
-package unit.adapters;
+package unit.adapters.gateway;
 
 import domain.ports.gateway.SecurityGateway;
 import domain.usecases.GenerateRandomBytes;
