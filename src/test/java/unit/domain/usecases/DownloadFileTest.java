@@ -1,6 +1,7 @@
 package unit.domain.usecases;
 
 import domain.entities.CustomFile;
+import domain.exceptions.AccessDeniedException;
 import domain.values.CryptoParams;
 import domain.exceptions.NotFoundException;
 import domain.ports.repository.FileMetadaRepository;
@@ -36,7 +37,7 @@ public class DownloadFileTest {
     }
 
     @Test(expected = NotFoundException.class)
-    public void download_unknown_file_should_throw_not_found() throws Exception {
+    public void download_unknown_file_should_throw_not_found() {
         downloadFile.handle("unknown_file.txt");
     }
 
@@ -80,5 +81,16 @@ public class DownloadFileTest {
 
         //THEN
         assertThat(foundFile + " != " + sourceFile,foundFile, is(equalTo(sourceFile)));
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    public void download_file_encrypted_with_password_missing_password_in_param_should_throw_access_denied_exception() throws Exception {
+        //GIVEN
+        CustomFile sourceFile = createcustomFileWithMonFichier(MON_FICHIER_TXT);
+        CryptoParams params = CryptoParams.of(true, "password");
+        uploadFile.handle(sourceFile, params);
+
+        //WHEN
+        downloadFile.handle(MON_FICHIER_TXT);
     }
 }

@@ -1,6 +1,7 @@
 package domain.usecases;
 
 import domain.entities.CustomFile;
+import domain.exceptions.AccessDeniedException;
 import domain.exceptions.NotFoundException;
 import domain.ports.gateway.FileSystemGateway;
 import domain.ports.repository.FileMetadaRepository;
@@ -19,10 +20,18 @@ public class DownloadFile {
         this.decryptContentFile = decryptContentFile;
     }
 
-    public CustomFile handle(String fileName) throws Exception {
+    public CustomFile handle(String fileName) {
         FileMetadata metadata = findMetadataFromRepos(fileName);
         CustomFile customFile = getCustomFromFileSystem(fileName);
-        return metadata.encrypted ? decryptContentFile.decrypt(customFile) : customFile;
+        return metadata.encrypted ? decryptContent(customFile) : customFile;
+    }
+
+    private CustomFile decryptContent(CustomFile customFile) {
+        try {
+            return decryptContentFile.decrypt(customFile);
+        } catch (Exception exception) {
+            throw new AccessDeniedException();
+        }
     }
 
     public CustomFile handleWithPassword(String fileName, String password) throws Exception {
@@ -32,7 +41,7 @@ public class DownloadFile {
 
     private FileMetadata findMetadataFromRepos(String fileName) {
         Optional<FileMetadata> foundMetadata = fileMetadaRepository.findByName(fileName);
-        if(foundMetadata.isEmpty()) throw new NotFoundException("Le fichier " + fileName + " n'existe pas");
+        if (foundMetadata.isEmpty()) throw new NotFoundException("Le fichier " + fileName + " n'existe pas");
         return foundMetadata.get();
     }
 
