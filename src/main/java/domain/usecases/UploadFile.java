@@ -1,7 +1,7 @@
 package domain.usecases;
 
 import domain.entities.CustomFile;
-import domain.entities.CryptoParams;
+import domain.values.CryptoParams;
 import domain.exceptions.DuplicateFileNameException;
 import domain.exceptions.EmptyFileException;
 import domain.exceptions.MissingFileExsception;

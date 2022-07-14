@@ -1,4 +1,4 @@
-package domain.entities;
+package domain.values;
 
 public class CipherOptions {
     public final int mode;

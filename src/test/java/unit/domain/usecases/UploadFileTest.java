@@ -1,7 +1,7 @@
 package unit.domain.usecases;
 
 import domain.entities.CustomFile;
-import domain.entities.CryptoParams;
+import domain.values.CryptoParams;
 import domain.exceptions.DuplicateFileNameException;
 import domain.exceptions.EmptyFileException;
 import domain.exceptions.MissingFileExsception;
@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static unit.domain.usecases.TestFileUtils.*;
 
-public class uploadFileTest {
+public class UploadFileTest {
 
     private InMemoryFileSystemGateway memoryFileSystemGateway;
     private InMemorySecurityGateway memorySecurityGateway;

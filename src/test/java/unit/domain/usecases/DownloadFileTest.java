@@ -1,7 +1,7 @@
 package unit.domain.usecases;
 
 import domain.entities.CustomFile;
-import domain.entities.CryptoParams;
+import domain.values.CryptoParams;
 import domain.exceptions.NotFoundException;
 import domain.ports.repository.FileMetadaRepository;
 import domain.usecases.*;
@@ -17,7 +17,7 @@ import static org.junit.Assert.assertThat;
 import static unit.domain.usecases.TestFileUtils.MON_FICHIER_TXT;
 import static unit.domain.usecases.TestFileUtils.createcustomFileWithMonFichier;
 
-public class downloadFileTest {
+public class DownloadFileTest {
 
     private InMemoryFileSystemGateway memoryFileSystemGateway;
     private UploadFile uploadFile;

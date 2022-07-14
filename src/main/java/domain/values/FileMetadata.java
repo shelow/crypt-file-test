@@ -1,7 +1,6 @@
 package domain.values;
 
 import domain.entities.CustomFile;
-import domain.entities.CryptoParams;
 
 import java.time.LocalDateTime;
 

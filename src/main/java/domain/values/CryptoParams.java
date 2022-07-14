@@ -1,4 +1,4 @@
-package domain.entities;
+package domain.values;
 
 import domain.exceptions.MissingPasswordException;
 

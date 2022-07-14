@@ -1,8 +1,7 @@
 package domain.usecases;
 
-import domain.entities.CipherOptions;
+import domain.values.CipherOptions;
 
-import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;

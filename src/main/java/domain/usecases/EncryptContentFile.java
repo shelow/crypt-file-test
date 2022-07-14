@@ -1,7 +1,7 @@
 package domain.usecases;
 
-import domain.entities.CipherOptions;
-import domain.entities.CryptoParams;
+import domain.values.CipherOptions;
+import domain.values.CryptoParams;
 import domain.entities.CustomFile;
 
 import java.nio.ByteBuffer;
