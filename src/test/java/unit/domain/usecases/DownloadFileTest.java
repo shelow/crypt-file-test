@@ -6,6 +6,7 @@ import domain.values.CryptoParams;
 import domain.exceptions.NotFoundException;
 import domain.ports.repository.FileMetadaRepository;
 import domain.usecases.*;
+import domain.values.STR;
 import org.junit.Before;
 import org.junit.Test;
 import unit.adapters.repository.InMemoryFileMetadaRepository;
@@ -38,7 +39,7 @@ public class DownloadFileTest {
 
     @Test(expected = NotFoundException.class)
     public void download_unknown_file_should_throw_not_found() {
-        downloadFile.handle("unknown_file.txt");
+        downloadFile.handle("unknown_file.txt", STR.EMPTY);
     }
 
     @Test
@@ -49,7 +50,21 @@ public class DownloadFileTest {
         uploadFile.handle(customFile, params);
 
         //WHEN
-        CustomFile file = downloadFile.handle(MON_FICHIER_TXT);
+        CustomFile file = downloadFile.handle(MON_FICHIER_TXT, STR.EMPTY);
+
+        //THEN
+        assertThat(file, is(equalTo(customFile)));
+    }
+
+    @Test
+    public void download_file_null_password_should_return_requested_file() throws Exception {
+        //GIVEN
+        CustomFile customFile = createcustomFileWithMonFichier(MON_FICHIER_TXT);
+        CryptoParams params = CryptoParams.of(false);
+        uploadFile.handle(customFile, params);
+
+        //WHEN
+        CustomFile file = downloadFile.handle(MON_FICHIER_TXT, null);
 
         //THEN
         assertThat(file, is(equalTo(customFile)));
@@ -63,7 +78,7 @@ public class DownloadFileTest {
         uploadFile.handle(sourceFile, params);
 
         //WHEN
-        CustomFile foundFile = downloadFile.handle(MON_FICHIER_TXT);
+        CustomFile foundFile = downloadFile.handle(MON_FICHIER_TXT, STR.EMPTY);
 
         //THEN
         assertThat(foundFile + " != " + sourceFile,foundFile, is(equalTo(sourceFile)));
@@ -77,7 +92,7 @@ public class DownloadFileTest {
         uploadFile.handle(sourceFile, params);
 
         //WHEN
-        CustomFile foundFile = downloadFile.handleWithPassword(MON_FICHIER_TXT, "password");
+        CustomFile foundFile = downloadFile.handle(MON_FICHIER_TXT, "password");
 
         //THEN
         assertThat(foundFile + " != " + sourceFile,foundFile, is(equalTo(sourceFile)));
@@ -91,6 +106,28 @@ public class DownloadFileTest {
         uploadFile.handle(sourceFile, params);
 
         //WHEN
-        downloadFile.handle(MON_FICHIER_TXT);
+        downloadFile.handle(MON_FICHIER_TXT, STR.EMPTY);
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    public void download_file_encrypted_with_password_wrong_password_in_param_should_throw_access_denied_exception() throws Exception {
+        //GIVEN
+        CustomFile sourceFile = createcustomFileWithMonFichier(MON_FICHIER_TXT);
+        CryptoParams params = CryptoParams.of(true, "wrong_password");
+        uploadFile.handle(sourceFile, params);
+
+        //WHEN
+        downloadFile.handle(MON_FICHIER_TXT, STR.EMPTY);
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    public void download_file_encrypted_without_but_with_password_in_param_should_throw_access_denied_exception() throws Exception {
+        //GIVEN
+        CustomFile sourceFile = createcustomFileWithMonFichier(MON_FICHIER_TXT);
+        CryptoParams params = CryptoParams.of(true);
+        uploadFile.handle(sourceFile, params);
+
+        //WHEN
+        downloadFile.handle(MON_FICHIER_TXT, "password");
     }
 }

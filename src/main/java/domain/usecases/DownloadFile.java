@@ -6,6 +6,7 @@ import domain.exceptions.NotFoundException;
 import domain.ports.gateway.FileSystemGateway;
 import domain.ports.repository.FileMetadaRepository;
 import domain.values.FileMetadata;
+import domain.values.STR;
 
 import java.util.Optional;
 
@@ -20,23 +21,20 @@ public class DownloadFile {
         this.decryptContentFile = decryptContentFile;
     }
 
-    public CustomFile handle(String fileName) {
+    public CustomFile handle(String fileName, String password) {
         FileMetadata metadata = findMetadataFromRepos(fileName);
         CustomFile customFile = getCustomFromFileSystem(fileName);
-        return metadata.encrypted ? decryptContent(customFile) : customFile;
+        return metadata.encrypted ? decryptContent(customFile, password) : customFile;
     }
 
-    private CustomFile decryptContent(CustomFile customFile) {
+    private CustomFile decryptContent(CustomFile customFile, String password) {
         try {
-            return decryptContentFile.decrypt(customFile);
+            return STR.isEmpty(password)
+                    ? decryptContentFile.decrypt(customFile)
+                    : decryptContentFile.decryptWithPassword(customFile, password);
         } catch (Exception exception) {
             throw new AccessDeniedException();
         }
-    }
-
-    public CustomFile handleWithPassword(String fileName, String password) throws Exception {
-        CustomFile customFile = getCustomFromFileSystem(fileName);
-        return decryptContentFile.decryptWithPassword(customFile, password);
     }
 
     private FileMetadata findMetadataFromRepos(String fileName) {
