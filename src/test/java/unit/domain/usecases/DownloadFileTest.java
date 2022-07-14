@@ -2,17 +2,17 @@ package unit.domain.usecases;
 
 import domain.entities.CustomFile;
 import domain.exceptions.AccessDeniedException;
-import domain.values.CryptoParams;
 import domain.exceptions.NotFoundException;
 import domain.ports.repository.FileMetadaRepository;
 import domain.usecases.*;
-import domain.values.STR;
+import domain.values.CryptoParams;
 import org.junit.Before;
 import org.junit.Test;
-import unit.adapters.repository.InMemoryFileMetadaRepository;
 import unit.adapters.gateway.InMemoryFileSystemGateway;
 import unit.adapters.gateway.InMemorySecurityGateway;
+import unit.adapters.repository.InMemoryFileMetadaRepository;
 
+import static domain.values.STR.EMPTY;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -21,13 +21,12 @@ import static unit.domain.usecases.TestFileUtils.createcustomFileWithMonFichier;
 
 public class DownloadFileTest {
 
-    private InMemoryFileSystemGateway memoryFileSystemGateway;
     private UploadFile uploadFile;
     private DownloadFile downloadFile;
 
     @Before
     public void setUp(){
-        memoryFileSystemGateway = new InMemoryFileSystemGateway();
+        InMemoryFileSystemGateway memoryFileSystemGateway = new InMemoryFileSystemGateway();
         InMemorySecurityGateway memorySecurityGateway = new InMemorySecurityGateway();
         GenerateNewContent generateSecreteKey = new GenerateNewContent(memorySecurityGateway);
         EncryptContentFile encryptContentFile = new EncryptContentFile(generateSecreteKey);
@@ -39,18 +38,18 @@ public class DownloadFileTest {
 
     @Test(expected = NotFoundException.class)
     public void download_unknown_file_should_throw_not_found() {
-        downloadFile.handle("unknown_file.txt", STR.EMPTY);
+        downloadFile.handle("unknown_file.txt", EMPTY);
     }
 
     @Test
     public void download_file_should_return_requested_file() throws Exception {
         //GIVEN
         CustomFile customFile = createcustomFileWithMonFichier(MON_FICHIER_TXT);
-        CryptoParams params = CryptoParams.of(false);
+        CryptoParams params = CryptoParams.of(false, EMPTY);
         uploadFile.handle(customFile, params);
 
         //WHEN
-        CustomFile file = downloadFile.handle(MON_FICHIER_TXT, STR.EMPTY);
+        CustomFile file = downloadFile.handle(MON_FICHIER_TXT, EMPTY);
 
         //THEN
         assertThat(file, is(equalTo(customFile)));
@@ -60,7 +59,7 @@ public class DownloadFileTest {
     public void download_file_null_password_should_return_requested_file() throws Exception {
         //GIVEN
         CustomFile customFile = createcustomFileWithMonFichier(MON_FICHIER_TXT);
-        CryptoParams params = CryptoParams.of(false);
+        CryptoParams params = CryptoParams.of(false, EMPTY);
         uploadFile.handle(customFile, params);
 
         //WHEN
@@ -74,11 +73,11 @@ public class DownloadFileTest {
     public void download_file_encrypted_should_return_decrypted_file() throws Exception {
         //GIVEN
         CustomFile sourceFile = createcustomFileWithMonFichier(MON_FICHIER_TXT);
-        CryptoParams params = CryptoParams.of(true);
+        CryptoParams params = CryptoParams.of(true, EMPTY);
         uploadFile.handle(sourceFile, params);
 
         //WHEN
-        CustomFile foundFile = downloadFile.handle(MON_FICHIER_TXT, STR.EMPTY);
+        CustomFile foundFile = downloadFile.handle(MON_FICHIER_TXT, EMPTY);
 
         //THEN
         assertThat(foundFile + " != " + sourceFile,foundFile, is(equalTo(sourceFile)));
@@ -106,7 +105,7 @@ public class DownloadFileTest {
         uploadFile.handle(sourceFile, params);
 
         //WHEN
-        downloadFile.handle(MON_FICHIER_TXT, STR.EMPTY);
+        downloadFile.handle(MON_FICHIER_TXT, EMPTY);
     }
 
     @Test(expected = AccessDeniedException.class)
@@ -117,14 +116,14 @@ public class DownloadFileTest {
         uploadFile.handle(sourceFile, params);
 
         //WHEN
-        downloadFile.handle(MON_FICHIER_TXT, STR.EMPTY);
+        downloadFile.handle(MON_FICHIER_TXT, EMPTY);
     }
 
     @Test(expected = AccessDeniedException.class)
     public void download_file_encrypted_without_but_with_password_in_param_should_throw_access_denied_exception() throws Exception {
         //GIVEN
         CustomFile sourceFile = createcustomFileWithMonFichier(MON_FICHIER_TXT);
-        CryptoParams params = CryptoParams.of(true);
+        CryptoParams params = CryptoParams.of(true, EMPTY);
         uploadFile.handle(sourceFile, params);
 
         //WHEN

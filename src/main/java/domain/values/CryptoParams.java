@@ -1,7 +1,5 @@
 package domain.values;
 
-import domain.exceptions.MissingPasswordException;
-
 public class CryptoParams {
     public final boolean shouldEncryptFile;
     public final char[] password;
@@ -12,11 +10,7 @@ public class CryptoParams {
     }
 
     public static CryptoParams of(boolean encryptFile, String password) {
-        if(password == null || password.isEmpty()) throw new MissingPasswordException();
-        return new CryptoParams(encryptFile, password.toCharArray());
+        return new CryptoParams(encryptFile, STR.isEmpty(password) ? new char[0] : password.toCharArray());
     }
 
-    public static CryptoParams of(boolean encryptFile) {
-        return new CryptoParams(encryptFile, new char[0]);
-    }
 }

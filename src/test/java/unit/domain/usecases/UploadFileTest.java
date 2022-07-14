@@ -1,21 +1,21 @@
 package unit.domain.usecases;
 
 import domain.entities.CustomFile;
-import domain.values.CryptoParams;
 import domain.exceptions.DuplicateFileNameException;
 import domain.exceptions.EmptyFileException;
 import domain.exceptions.MissingFileExsception;
-import domain.exceptions.MissingPasswordException;
 import domain.ports.repository.FileMetadaRepository;
 import domain.usecases.EncryptContentFile;
 import domain.usecases.GenerateNewContent;
 import domain.usecases.UploadFile;
+import domain.values.CryptoParams;
 import org.junit.Before;
 import org.junit.Test;
 import unit.adapters.gateway.InMemoryFileSystemGateway;
 import unit.adapters.gateway.InMemorySecurityGateway;
 import unit.adapters.repository.InMemoryFileMetadaRepository;
 
+import static domain.values.STR.EMPTY;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static unit.domain.usecases.TestFileUtils.*;
@@ -23,15 +23,13 @@ import static unit.domain.usecases.TestFileUtils.*;
 public class UploadFileTest {
 
     private InMemoryFileSystemGateway memoryFileSystemGateway;
-    private InMemorySecurityGateway memorySecurityGateway;
     private UploadFile uploadFile;
-    private FileMetadaRepository fileMetadaRepository;
 
     @Before
     public void setUp(){
         memoryFileSystemGateway = new InMemoryFileSystemGateway();
-        memorySecurityGateway = new InMemorySecurityGateway();
-        fileMetadaRepository = new InMemoryFileMetadaRepository();
+        InMemorySecurityGateway memorySecurityGateway = new InMemorySecurityGateway();
+        FileMetadaRepository fileMetadaRepository = new InMemoryFileMetadaRepository();
         GenerateNewContent generateNewContent = new GenerateNewContent(memorySecurityGateway);
         EncryptContentFile encryptContentFile = new EncryptContentFile(generateNewContent);
         uploadFile = new UploadFile(memoryFileSystemGateway, encryptContentFile, fileMetadaRepository);
@@ -40,7 +38,7 @@ public class UploadFileTest {
     @Test(expected = MissingFileExsception.class)
     public void upload_null_file_should_throw_missing_file_exception() throws Exception {
         //WHEN
-        uploadFile.handle(null, CryptoParams.of(false));
+        uploadFile.handle(null, CryptoParams.of(false, EMPTY));
     }
 
     @Test
@@ -49,7 +47,7 @@ public class UploadFileTest {
         CustomFile customFileWithMonFichier = createcustomFileWithMonFichier(MON_FICHIER_TXT);
 
         //WHEN
-        uploadFile.handle(customFileWithMonFichier, CryptoParams.of(false));
+        uploadFile.handle(customFileWithMonFichier, CryptoParams.of(false, EMPTY));
 
         //THEN
         CustomFile found = memoryFileSystemGateway.read(MON_FICHIER_TXT).orElseThrow();
@@ -62,8 +60,8 @@ public class UploadFileTest {
         CustomFile customFileWithMonFichier = createcustomFileWithMonFichier(MON_FICHIER_TXT);
 
         //WHEN
-        uploadFile.handle(customFileWithMonFichier, CryptoParams.of(false));
-        uploadFile.handle(customFileWithMonFichier, CryptoParams.of(false));
+        uploadFile.handle(customFileWithMonFichier, CryptoParams.of(false, EMPTY));
+        uploadFile.handle(customFileWithMonFichier, CryptoParams.of(false, EMPTY));
     }
 
     @Test(expected = EmptyFileException.class)
@@ -72,7 +70,7 @@ public class UploadFileTest {
         CustomFile customFileWithMonFichier = createcustomFileWithMonFichier(EMPTY_FILE_TXT);
 
         //WHEN
-        uploadFile.handle(customFileWithMonFichier, CryptoParams.of(false));
+        uploadFile.handle(customFileWithMonFichier, CryptoParams.of(false, EMPTY));
     }
 
     @Test
@@ -81,7 +79,7 @@ public class UploadFileTest {
         CustomFile customFileWithMonFichier = createcustomFileWithMonFichier(MON_FICHIER_TXT);
 
         //WHEN
-        uploadFile.handle(customFileWithMonFichier, CryptoParams.of(true));
+        uploadFile.handle(customFileWithMonFichier, CryptoParams.of(true, EMPTY));
 
         //THEN
         CustomFile found = memoryFileSystemGateway.read(MON_FICHIER_TXT).orElseThrow();
@@ -100,18 +98,6 @@ public class UploadFileTest {
         //THEN
         CustomFile found = memoryFileSystemGateway.read(MON_FICHIER_TXT).orElseThrow();
         assertThat(getContentFileAsString(found), is(not(equalTo("Bonjour, tout le monde !!!"))));
-    }
-
-    @Test(expected = MissingPasswordException.class)
-    public void upload_file_with_empty_password_should_throw_password_missing_exception() {
-        //WHEN
-        CryptoParams.of(true, "");
-    }
-
-    @Test(expected = MissingPasswordException.class)
-    public void upload_file_with_null_password_should_throw_password_missing_exception() {
-       //WHEN
-        CryptoParams.of(true, null);
     }
 
 }

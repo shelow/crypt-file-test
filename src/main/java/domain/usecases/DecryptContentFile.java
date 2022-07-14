@@ -1,12 +1,13 @@
 package domain.usecases;
 
+import domain.entities.CustomFile;
 import domain.values.CipherOptions;
 import domain.values.CryptoParams;
-import domain.entities.CustomFile;
 import domain.values.EncryptedExtraction;
 
 import java.nio.ByteBuffer;
 
+import static domain.values.STR.EMPTY;
 import static javax.crypto.Cipher.DECRYPT_MODE;
 
 public class DecryptContentFile {
@@ -22,7 +23,7 @@ public class DecryptContentFile {
     CustomFile decrypt(CustomFile customFile) throws Exception {
             EncryptedExtraction extraction = extractFromEncryptedContent(customFile, false);
             CipherOptions options = CipherOptions.of(DECRYPT_MODE, extraction.iv, extraction.salt);
-            byte[] bytes = generateNewContent.handle(extraction.content, CryptoParams.of(true), options);
+            byte[] bytes = generateNewContent.handle(extraction.content, CryptoParams.of(true, EMPTY), options);
             return new CustomFile(customFile.name, bytes);
     }
 
