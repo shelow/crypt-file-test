@@ -19,4 +19,8 @@ public class InMemoryFileSystemGateway implements FileSystemGateway {
     public Optional<CustomFile> read(String fileName) {
         return Optional.ofNullable(fileSaved.get(fileName));
     }
+
+    public void remove(String fileName) {
+        fileSaved.remove(fileName);
+    }
 }

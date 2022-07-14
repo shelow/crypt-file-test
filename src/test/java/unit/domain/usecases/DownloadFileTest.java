@@ -23,10 +23,11 @@ public class DownloadFileTest {
 
     private UploadFile uploadFile;
     private DownloadFile downloadFile;
+    private InMemoryFileSystemGateway memoryFileSystemGateway;
 
     @Before
     public void setUp(){
-        InMemoryFileSystemGateway memoryFileSystemGateway = new InMemoryFileSystemGateway();
+        memoryFileSystemGateway = new InMemoryFileSystemGateway();
         InMemorySecurityGateway memorySecurityGateway = new InMemorySecurityGateway();
         GenerateNewContent generateSecreteKey = new GenerateNewContent(memorySecurityGateway);
         EncryptContentFile encryptContentFile = new EncryptContentFile(generateSecreteKey);
@@ -128,5 +129,17 @@ public class DownloadFileTest {
 
         //WHEN
         downloadFile.handle(MON_FICHIER_TXT, "password");
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void download_file_encrypted_deleted_on_disk_should_throw_not_found() throws Exception {
+        //GIVEN
+        CustomFile sourceFile = createcustomFileWithMonFichier(MON_FICHIER_TXT);
+        CryptoParams params = CryptoParams.of(true, EMPTY);
+        uploadFile.handle(sourceFile, params);
+        memoryFileSystemGateway.remove(MON_FICHIER_TXT);
+
+        //WHEN
+        downloadFile.handle(MON_FICHIER_TXT, EMPTY);
     }
 }

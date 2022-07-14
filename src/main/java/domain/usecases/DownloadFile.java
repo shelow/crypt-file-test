@@ -44,6 +44,10 @@ public class DownloadFile {
     }
 
     private CustomFile getCustomFromFileSystem(String fileName) {
-        return fileSystemGateway.read(fileName).orElseThrow();
+        try {
+            return fileSystemGateway.read(fileName).orElseThrow();
+        } catch (Exception e){
+            throw new NotFoundException("Le fichier "+fileName+" n'a pas pu être récupéré sur le disque");
+        }
     }
 }
