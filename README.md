@@ -19,7 +19,7 @@
 ## /download et /upload
 - Deux pages ont été créées pour pouvoir télécharger ou uploader 
 ## properties
-- trois propriétés doivent être présente de le fichier de conf
+- trois propriétés doivent être présentes de le fichier de conf
 - secretKey
 - destinationDirectory
 - databasePath (le fichier doit exister même s'il est vide avant le démarrage de l'appli) 
