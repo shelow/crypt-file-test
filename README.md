@@ -6,6 +6,8 @@
 - Tout le code métier se trouve dans le package : domain
 - Le code business est réalisé à partir de la TDD
 - La couverture de test du domain est de 100% (car réalisé en TDD)
+- Chaque use case du métier est implémenté dans le package domain.usecase
+- Les usecases principaux sont UploadFile et DownloadFile
 ## Ports
 - Tout branchement au métier se fait part l'implémentation des interfaces présentes dans le package domain.ports
 - Il y a trois interfaces pour se brancher au code métier : metadataRepository, FileSystemeGateway et SecurityGateway
