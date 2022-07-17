@@ -1,0 +1,24 @@
+<html xmlns:th="https://www.thymeleaf.org">
+<body>
+
+<div>
+    <form method="GET" enctype="multipart/form-data" action="/files">
+        <table>
+            <tr>
+                <td>File to download:</td>
+                <td><input type="text" name="fileName"/></td>
+            </tr>
+            <tr>
+                <td>Password to encrypt:</td>
+                <td><input type="password" name="password"/></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input type="submit" value="Download"/></td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+</body>
+</html>

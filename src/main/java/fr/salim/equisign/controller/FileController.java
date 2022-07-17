@@ -29,12 +29,12 @@ public class FileController {
     DownloadFile downloadFile;
 
     @PostMapping
-    public ResponseEntity<?> upload(@RequestParam MultipartFile file, @RequestParam String password){
+    public String upload(@RequestParam MultipartFile file, @RequestParam String password){
         try {
             LOGGER.info("début de l'upload du fichier " + file.getOriginalFilename());
             uploadFile(file, password);
             LOGGER.info("fin de l'upload du fichier " + file.getOriginalFilename());
-            return ResponseEntity.accepted().build();
+            return "success";
         } catch (Exception exception) {
             LOGGER.error("Erreur lors de l'upload de fichier", exception);
             throw new RuntimeException(exception);
@@ -49,8 +49,8 @@ public class FileController {
                 CryptoParams.of(true, password));
     }
 
-    @GetMapping("/{fileName:.+}")
-    public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable String fileName,  String password){
+    @GetMapping
+    public ResponseEntity<ByteArrayResource> downloadFile(String fileName,  String password){
         try {
             LOGGER.info("Téléchargement du fichier " + fileName );
             CustomFile fileFound = downloadFile.handle(fileName, password);
