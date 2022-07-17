@@ -1,6 +1,6 @@
 package unit.domain.usecases;
 
-import domain.entities.CustomFile;
+import fr.salim.equisign.domain.entities.CustomFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

@@ -1,18 +1,18 @@
 package unit.domain.usecases;
 
-import domain.entities.CustomFile;
-import domain.exceptions.AccessDeniedException;
-import domain.exceptions.NotFoundException;
-import domain.ports.repository.FileMetadaRepository;
-import domain.usecases.*;
-import domain.values.CryptoParams;
+import fr.salim.equisign.domain.entities.CustomFile;
+import fr.salim.equisign.domain.exceptions.AccessDeniedException;
+import fr.salim.equisign.domain.exceptions.NotFoundException;
+import fr.salim.equisign.domain.ports.repository.FileMetadataRepository;
+import fr.salim.equisign.domain.usecases.*;
+import fr.salim.equisign.domain.values.CryptoParams;
 import org.junit.Before;
 import org.junit.Test;
 import unit.adapters.gateway.InMemoryFileSystemGateway;
 import unit.adapters.gateway.InMemorySecurityGateway;
-import unit.adapters.repository.InMemoryFileMetadaRepository;
+import unit.adapters.repository.InMemoryFileMetadataRepository;
 
-import static domain.values.STR.EMPTY;
+import static fr.salim.equisign.domain.values.STR.EMPTY;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -32,9 +32,9 @@ public class DownloadFileTest {
         GenerateNewContent generateSecreteKey = new GenerateNewContent(memorySecurityGateway);
         EncryptContentFile encryptContentFile = new EncryptContentFile(generateSecreteKey);
         DecryptContentFile decryptContentFile = new DecryptContentFile(generateSecreteKey);
-        FileMetadaRepository fileMetadaRepository = new InMemoryFileMetadaRepository();
-        uploadFile = new UploadFile(memoryFileSystemGateway, encryptContentFile, fileMetadaRepository);
-        downloadFile = new DownloadFile(memoryFileSystemGateway, fileMetadaRepository, decryptContentFile);
+        FileMetadataRepository fileMetadataRepository = new InMemoryFileMetadataRepository();
+        uploadFile = new UploadFile(memoryFileSystemGateway, encryptContentFile, fileMetadataRepository);
+        downloadFile = new DownloadFile(memoryFileSystemGateway, fileMetadataRepository, decryptContentFile);
     }
 
     @Test(expected = NotFoundException.class)

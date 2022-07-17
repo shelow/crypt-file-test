@@ -1,7 +1,7 @@
 package unit.adapters.gateway;
 
-import domain.entities.CustomFile;
-import domain.ports.gateway.FileSystemGateway;
+import fr.salim.equisign.domain.entities.CustomFile;
+import fr.salim.equisign.domain.ports.gateway.FileSystemGateway;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,9 +11,8 @@ public class InMemoryFileSystemGateway implements FileSystemGateway {
 
     Map<String, CustomFile> fileSaved = new HashMap<>();
 
-    public boolean write(CustomFile file) {
+    public void write(CustomFile file) {
         fileSaved.put(file.name, file);
-        return true;
     }
 
     public Optional<CustomFile> read(String fileName) {

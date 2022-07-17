@@ -1,21 +1,22 @@
 package unit.domain.usecases;
 
-import domain.entities.CustomFile;
-import domain.exceptions.DuplicateFileNameException;
-import domain.exceptions.EmptyFileException;
-import domain.exceptions.MissingFileExsception;
-import domain.ports.repository.FileMetadaRepository;
-import domain.usecases.EncryptContentFile;
-import domain.usecases.GenerateNewContent;
-import domain.usecases.UploadFile;
-import domain.values.CryptoParams;
+import fr.salim.equisign.domain.entities.CustomFile;
+import fr.salim.equisign.domain.exceptions.DuplicateFileNameException;
+import fr.salim.equisign.domain.exceptions.EmptyFileException;
+import fr.salim.equisign.domain.exceptions.MissingFileException;
+import fr.salim.equisign.domain.ports.repository.FileMetadataRepository;
+import fr.salim.equisign.domain.usecases.EncryptContentFile;
+import fr.salim.equisign.domain.usecases.GenerateNewContent;
+import fr.salim.equisign.domain.usecases.UploadFile;
+import fr.salim.equisign.domain.values.CryptoParams;
+import fr.salim.equisign.domain.entities.FileMetadata;
 import org.junit.Before;
 import org.junit.Test;
 import unit.adapters.gateway.InMemoryFileSystemGateway;
 import unit.adapters.gateway.InMemorySecurityGateway;
-import unit.adapters.repository.InMemoryFileMetadaRepository;
+import unit.adapters.repository.InMemoryFileMetadataRepository;
 
-import static domain.values.STR.EMPTY;
+import static fr.salim.equisign.domain.values.STR.EMPTY;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static unit.domain.usecases.TestFileUtils.*;
@@ -24,18 +25,19 @@ public class UploadFileTest {
 
     private InMemoryFileSystemGateway memoryFileSystemGateway;
     private UploadFile uploadFile;
+    private FileMetadataRepository fileMetadataRepository;
 
     @Before
     public void setUp(){
         memoryFileSystemGateway = new InMemoryFileSystemGateway();
         InMemorySecurityGateway memorySecurityGateway = new InMemorySecurityGateway();
-        FileMetadaRepository fileMetadaRepository = new InMemoryFileMetadaRepository();
+        fileMetadataRepository = new InMemoryFileMetadataRepository();
         GenerateNewContent generateNewContent = new GenerateNewContent(memorySecurityGateway);
         EncryptContentFile encryptContentFile = new EncryptContentFile(generateNewContent);
-        uploadFile = new UploadFile(memoryFileSystemGateway, encryptContentFile, fileMetadaRepository);
+        uploadFile = new UploadFile(memoryFileSystemGateway, encryptContentFile, fileMetadataRepository);
     }
 
-    @Test(expected = MissingFileExsception.class)
+    @Test(expected = MissingFileException.class)
     public void upload_null_file_should_throw_missing_file_exception() throws Exception {
         //WHEN
         uploadFile.handle(null, CryptoParams.of(false, EMPTY));
@@ -84,6 +86,9 @@ public class UploadFileTest {
         //THEN
         CustomFile found = memoryFileSystemGateway.read(MON_FICHIER_TXT).orElseThrow();
         assertThat(getContentFileAsString(found), is(not(equalTo("Bonjour, tout le monde !!!"))));
+        FileMetadata saved = fileMetadataRepository.findByName(MON_FICHIER_TXT).orElseThrow();
+        FileMetadata expected = new FileMetadata(MON_FICHIER_TXT, true, false, saved.saveDate);
+        assertThat(saved, is(equalTo(expected)));
     }
 
     @Test
@@ -98,6 +103,9 @@ public class UploadFileTest {
         //THEN
         CustomFile found = memoryFileSystemGateway.read(MON_FICHIER_TXT).orElseThrow();
         assertThat(getContentFileAsString(found), is(not(equalTo("Bonjour, tout le monde !!!"))));
+        FileMetadata saved = fileMetadataRepository.findByName(MON_FICHIER_TXT).orElseThrow();
+        FileMetadata expected = new FileMetadata(MON_FICHIER_TXT, true, true, saved.saveDate);
+        assertThat(saved, is(equalTo(expected)));
     }
 
 }

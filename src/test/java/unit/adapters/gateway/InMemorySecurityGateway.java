@@ -1,7 +1,7 @@
 package unit.adapters.gateway;
 
-import domain.ports.gateway.SecurityGateway;
-import domain.usecases.GenerateRandomBytes;
+import fr.salim.equisign.domain.ports.gateway.SecurityGateway;
+import fr.salim.equisign.domain.usecases.GenerateRandomBytes;
 
 public class InMemorySecurityGateway implements SecurityGateway {
 
