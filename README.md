@@ -15,7 +15,7 @@
 - Tout interfaçage au domain se trouve dans le package adapters
 - Implémentation du repository (volontairement choisi de persister dans un fichier pour que vous puisser imaginer simplement le changement de choix technique si besoin)
 - Implémentation de la passerelle de sécu (ici on regarde bêtement dans le fichier de conf, cela peut être remplacer part une vairaible d'env ou un appel à un serveur dédié sans impact sur le code métier)
-- Implémentation de du file système ici on enregistre sur le disque local (cette implèmentation peut également facilement être remplacée par la sauvegarde sur serveur distant sans impacter le code métier)
+- Implémentation du file système ici on enregistre sur le disque local (cette implèmentation peut également être remplacée par la sauvegarde sur serveur distant sans impacter le code métier)
 ## /download et /upload
 - Deux pages ont été créées pour pouvoir télécharger ou uploader 
 ## properties
